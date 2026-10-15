@@ -15,11 +15,11 @@ struct ContentView: View {
             PreviewView()
                 .inspector(isPresented: $showsInspector) {
                     SettingsInspector()
-                        .inspectorColumnWidth(min: 260, ideal: 300, max: 420)
+                        .inspectorColumnWidth(min: 300, ideal: 340, max: 440)
                 }
         }
         .toolbar {
-            ToolbarItemGroup(placement: .primaryAction) {
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     model.copySelected()
                 } label: {
@@ -27,19 +27,26 @@ struct ContentView: View {
                 }
                 .help("Copy optimized SVG")
                 .disabled(model.selectedFile.flatMap { model.results[$0.id]?.output } == nil)
+            }
 
+            ToolbarItem(placement: .primaryAction) {
                 Menu {
-                    Button("Save All to Folder…", systemImage: "folder") { model.exportToFolder() }
-                    Button("Overwrite Originals…", systemImage: "exclamationmark.triangle", role: .destructive) {
+                    Button("Save All to Folder…") { model.exportToFolder() }
+                    Button("Overwrite Originals…", role: .destructive) {
                         model.isConfirmingOverwrite = true
                     }
                     .disabled(model.overwritableCount == 0)
                 } label: {
                     Label(exportTitle, systemImage: "square.and.arrow.down.on.square")
                 }
+                .buttonStyle(.glassProminent)
                 .help("Export optimized SVGs")
                 .disabled(model.exportable.isEmpty)
+            }
 
+            ToolbarSpacer(.fixed, placement: .primaryAction)
+
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     showsInspector.toggle()
                 } label: {
@@ -78,20 +85,20 @@ struct ContentView: View {
 private struct DropOverlay: View {
     var body: some View {
         ZStack {
-            Rectangle().fill(.regularMaterial)
-            VStack(spacing: 12) {
-                Image(systemName: "arrow.down.doc")
-                    .font(.system(size: 32))
+            Rectangle().fill(.tint.opacity(0.08))
+            RoundedRectangle(cornerRadius: 26)
+                .strokeBorder(.tint, style: StrokeStyle(lineWidth: 2.5, dash: [10, 8]))
+                .padding(20)
+            VStack(spacing: 14) {
+                Image(systemName: "arrow.down.document.fill")
+                    .font(.system(size: 40))
                     .foregroundStyle(.tint)
-                Text("Drop SVGs to add them")
-                    .font(.title3.weight(.semibold))
+                Text("Drop to add SVGs")
+                    .font(.title2.weight(.semibold))
             }
-            .padding(.horizontal, 56)
-            .padding(.vertical, 48)
-            .overlay {
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(.tint, style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
-            }
+            .padding(.horizontal, 48)
+            .padding(.vertical, 36)
+            .glassEffect(.regular, in: .rect(cornerRadius: 24))
         }
         .ignoresSafeArea()
         .allowsHitTesting(false)
@@ -118,11 +125,10 @@ private struct ToastView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-                .shadow(color: .black.opacity(0.15), radius: 12, y: 4)
-                .frame(maxWidth: 420)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .glassEffect(.regular, in: .rect(cornerRadius: 20))
+                .frame(maxWidth: 440)
                 .padding(.bottom, 20)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .onTapGesture { model.toast = nil }

@@ -13,15 +13,7 @@ struct PreviewView: View {
         if let file = model.selectedFile {
             detail(file: file, result: model.results[file.id])
         } else if model.files.isEmpty {
-            ContentUnavailableView {
-                Label("Drop SVGs to optimize", systemImage: "wand.and.sparkles")
-            } description: {
-                Text("Drag and drop SVG files or folders anywhere, choose them manually, or paste SVG markup.")
-            } actions: {
-                Button("Choose Files…") { model.chooseFiles() }
-                    .buttonStyle(.borderedProminent)
-                Button("Paste SVG", systemImage: "list.clipboard") { model.pasteFromClipboard() }
-            }
+            WelcomeView()
         } else {
             ContentUnavailableView("Select a file", systemImage: "sidebar.left",
                                    description: Text("Choose a file from the list to preview it."))
@@ -39,12 +31,7 @@ struct PreviewView: View {
                 Stat(label: "Saved", value: optimizedSize != nil ? Format.percent(percent) : "-",
                      highlight: percent > 0)
                 Spacer()
-                Picker("View", selection: $mode) {
-                    ForEach(Mode.allCases, id: \.self) { Text($0.rawValue) }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .fixedSize()
+                GlassSegmentedPicker(selection: $mode, options: Mode.allCases.map { ($0, $0.rawValue) })
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
@@ -102,8 +89,8 @@ private struct ComparePanel: View {
                     .monospacedDigit()
             }
             SVGPreview(svg: content)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.separator))
+                .clipShape(.rect(cornerRadius: 18))
+                .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(.separator))
         }
     }
 }
@@ -123,8 +110,8 @@ private struct ErrorCallout: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(12)
-        .background(.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.red.opacity(0.3)))
+        .padding(16)
+        .background(.red.opacity(0.1), in: .rect(cornerRadius: 18))
+        .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(.red.opacity(0.3)))
     }
 }

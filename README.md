@@ -4,7 +4,7 @@ Native macOS app (SwiftUI) to optimize SVGs in bulk with SVGO. Rebuild of the Gl
 
 ## How it works
 
-- UI in SwiftUI (macOS 14+, Apple silicon).
+- UI in SwiftUI (macOS 26+, Apple silicon).
 - SVGO 3.3.3 is bundled as a single script (`Resources/svgo.js`) and runs in Apple's JavaScriptCore.
 - Previews render with WebKit, so they match what a browser shows.
 - Settings are stored in UserDefaults (`nl.cube.svgcleaner`).

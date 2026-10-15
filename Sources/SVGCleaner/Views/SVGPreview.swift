@@ -18,8 +18,17 @@ struct SVGPreview: NSViewRepresentable {
         view.loadHTMLString(html, baseURL: nil)
     }
 
+    // An <img> keeps the SVG sandboxed, but there currentColor is always black. Substitute the label
+    // color per appearance so currentColor icons stay visible in dark mode.
     private static func html(for svg: String?) -> String {
-        let image = svg.map { "<img src=\"data:image/svg+xml;base64,\(Data($0.utf8).base64EncodedString())\">" } ?? ""
+        let image = svg.map { svg in
+            """
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset="\(dataURL(svg, currentColor: "#f5f5f7"))">
+              <img src="\(dataURL(svg, currentColor: "#1d1d1f"))">
+            </picture>
+            """
+        } ?? ""
         return """
         <!doctype html>
         <meta name="color-scheme" content="light dark">
@@ -38,10 +47,16 @@ struct SVGPreview: NSViewRepresentable {
             background-size: 16px 16px;
             background-position: 0 0, 0 8px, 8px -8px, -8px 0;
           }
+          picture { flex: 1; display: flex; min-width: 0; min-height: 0; }
           img { flex: 1; min-width: 0; min-height: 0; object-fit: contain; padding: 24px; box-sizing: border-box; }
         </style>
         \(image)
         """
+    }
+
+    private static func dataURL(_ svg: String, currentColor: String) -> String {
+        let colored = svg.replacingOccurrences(of: "currentColor", with: currentColor, options: .caseInsensitive)
+        return "data:image/svg+xml;base64,\(Data(colored.utf8).base64EncodedString())"
     }
 }
 

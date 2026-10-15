@@ -11,21 +11,12 @@ struct FileListView: View {
                 FileRow(file: file, result: model.results[file.id])
                     .tag(file.id)
                     .contextMenu {
-                        Button("Remove", systemImage: "minus.circle") { model.remove(file.id) }
+                        Button("Remove") { model.remove(file.id) }
                     }
             }
         }
         .onDeleteCommand {
             if let id = model.selection { model.remove(id) }
-        }
-        .overlay {
-            if model.files.isEmpty {
-                ContentUnavailableView {
-                    Text("No SVGs yet")
-                } description: {
-                    Text("Drop files here, or use the + and paste buttons.")
-                }
-            }
         }
         .toolbar {
             ToolbarItemGroup {
@@ -35,9 +26,21 @@ struct FileListView: View {
                     Label("Paste SVG", systemImage: "list.clipboard")
                 }
                 .help("Paste SVG from clipboard")
-                Button { model.clear() } label: { Label("Remove all files", systemImage: "trash") }
-                    .help("Remove all files")
-                    .disabled(model.files.isEmpty)
+            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if !model.files.isEmpty {
+                HStack {
+                    Text("\(model.files.count) file\(model.files.count == 1 ? "" : "s")")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Clear All") { model.clear() }
+                        .buttonStyle(.glass)
+                        .controlSize(.small)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
             }
         }
     }
