@@ -43,7 +43,11 @@ struct AppCommands: Commands {
                 .keyboardShortcut("o")
             Button("Paste SVG") { model.pasteFromClipboard() }
                 .keyboardShortcut("v", modifiers: [.command, .shift])
-            Divider()
+        }
+        CommandGroup(replacing: .saveItem) {
+            Button("Save…") { model.save() }
+                .keyboardShortcut("s")
+                .disabled(model.selectedFile.flatMap { model.results[$0.id]?.output } == nil)
             Button("Copy Optimized SVG") { model.copySelected() }
                 .keyboardShortcut("c", modifiers: [.command, .shift])
                 .disabled(model.selectedFile.flatMap { model.results[$0.id]?.output } == nil)

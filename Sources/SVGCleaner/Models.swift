@@ -1,14 +1,15 @@
 import AppKit
 
 struct SVGFile: Identifiable {
-    let id = UUID()
+    let id: UUID
     let name: String
     /// Original location on disk, when known. Enables overwriting the original.
     let url: URL?
     let original: String
     let thumbnail: NSImage?
 
-    init(name: String, original: String, url: URL? = nil) {
+    init(id: UUID = UUID(), name: String, original: String, url: URL? = nil) {
+        self.id = id
         self.name = name
         self.url = url
         self.original = original
@@ -16,6 +17,11 @@ struct SVGFile: Identifiable {
     }
 
     var originalSize: Int { original.utf8.count }
+
+    /// The same file after its content on disk was replaced.
+    func replacingOriginal(with content: String) -> SVGFile {
+        SVGFile(id: id, name: name, original: content, url: url)
+    }
 }
 
 enum SVGResult {

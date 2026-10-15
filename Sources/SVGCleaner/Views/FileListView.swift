@@ -10,7 +10,11 @@ struct FileListView: View {
             ForEach(model.files) { file in
                 FileRow(file: file, result: model.results[file.id])
                     .tag(file.id)
+                    .onDrag { model.dragItem(for: file) }
                     .contextMenu {
+                        Button("Save As…") { model.save(file.id) }
+                            .disabled(model.results[file.id]?.output == nil)
+                        Divider()
                         Button("Remove") { model.remove(file.id) }
                     }
             }
@@ -31,9 +35,19 @@ struct FileListView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if !model.files.isEmpty {
                 HStack {
-                    Text("\(model.files.count) file\(model.files.count == 1 ? "" : "s")")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("\(model.files.count) file\(model.files.count == 1 ? "" : "s")")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                        if let total = model.totalSavings {
+                            Text(total.bytes >= 0
+                                 ? "\(Format.bytes(total.bytes)) saved (\(Format.percent(total.percent)))"
+                                 : "\(Format.bytes(-total.bytes)) larger (\(Format.percent(total.percent)))")
+                                .font(.caption)
+                                .monospacedDigit()
+                                .foregroundStyle(total.bytes > 0 ? .green : .secondary)
+                        }
+                    }
                     Spacer()
                     Button("Clear All") { model.clear() }
                         .buttonStyle(.glass)
