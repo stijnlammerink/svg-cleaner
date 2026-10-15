@@ -49,9 +49,57 @@ struct PreviewView: View {
                 }
                 .padding(24)
             } else {
-                CodeView(text: result?.output ?? "")
+                CodeAndDiff(file: file, output: result?.output)
             }
         }
+    }
+}
+
+/// The optimized code with its diff underneath. A hand-rolled divider instead of `VSplitView`,
+/// which loops on constraint updates when a pane changes size (the diff loads asynchronously).
+private struct CodeAndDiff: View {
+    let file: SVGFile
+    let output: String?
+
+    @AppStorage("codeDiffSplit") private var split = 0.55
+    @State private var dragStart: Double?
+
+    var body: some View {
+        GeometryReader { proxy in
+            let height = proxy.size.height
+            let codeHeight = min(max(height * split, 120), max(height - 120, 120))
+
+            VStack(spacing: 0) {
+                CodeView(text: output ?? "")
+                    .frame(height: codeHeight)
+                divider(totalHeight: height)
+                DiffPane(file: file, output: output)
+                    .frame(maxHeight: .infinity)
+            }
+        }
+    }
+
+    private func divider(totalHeight: CGFloat) -> some View {
+        Rectangle()
+            .fill(.separator)
+            .frame(height: 1)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 3)
+            .contentShape(Rectangle())
+            .onHover { inside in
+                if inside { NSCursor.resizeUpDown.push() } else { NSCursor.pop() }
+            }
+            .gesture(
+                DragGesture(minimumDistance: 1)
+                    .onChanged { value in
+                        let start = dragStart ?? split
+                        dragStart = start
+                        guard totalHeight > 0 else { return }
+                        split = min(max(start + value.translation.height / totalHeight, 0.15), 0.85)
+                    }
+                    .onEnded { _ in dragStart = nil }
+            )
+            .help("Drag to resize")
     }
 }
 

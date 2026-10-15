@@ -156,6 +156,12 @@ final class AppModel {
         jobs.append(job)
     }
 
+    func diff(original: String, optimized: String) async -> LineDiffResult {
+        let before = await optimizer.format(original) ?? original
+        let after = await optimizer.format(optimized) ?? optimized
+        return await Task.detached { LineDiff.compute(old: before, new: after) }.value
+    }
+
     private func cancelJobs() {
         jobs.forEach { $0.cancel() }
         jobs = []

@@ -27,10 +27,19 @@ actor SVGOptimizer {
     }
 
     func optimize(_ svg: String, settings: OptimizeSettings) -> SVGResult {
+        run(svg, config: settings.svgoConfig)
+    }
+
+    /// Pretty-prints the markup without optimizing it, so two versions can be compared line by line.
+    func format(_ svg: String) -> String? {
+        run(svg, config: ["plugins": [Any](), "js2svg": ["pretty": true, "indent": 2]]).output
+    }
+
+    private func run(_ svg: String, config: [String: Any]) -> SVGResult {
         guard let context, let run = context.objectForKeyedSubscript("runSvgo") else {
             return .failed(setupError ?? "SVGO is not available")
         }
-        guard let configData = try? JSONSerialization.data(withJSONObject: settings.svgoConfig),
+        guard let configData = try? JSONSerialization.data(withJSONObject: config),
               let config = String(data: configData, encoding: .utf8)
         else {
             return .failed("Invalid optimizer settings")
