@@ -1,0 +1,4 @@
+.build/
+build/
+vendor/node_modules/
+.DS_Store
