@@ -17,8 +17,12 @@ struct OptimizeSettings: Codable, Equatable {
         precision = try container.decodeIfPresent(Int.self, forKey: .precision) ?? defaults.precision
         pretty = try container.decodeIfPresent(Bool.self, forKey: .pretty) ?? defaults.pretty
         currentColor = try container.decodeIfPresent(Bool.self, forKey: .currentColor) ?? defaults.currentColor
-        let saved = try container.decodeIfPresent([String: Bool].self, forKey: .plugins) ?? [:]
-        plugins = defaults.plugins.merging(saved) { _, saved in saved }
+        var saved = try container.decodeIfPresent([String: Bool].self, forKey: .plugins) ?? [:]
+        // SVGO 4 renamed removeScriptElement; carry over the saved choice.
+        if let removeScripts = saved.removeValue(forKey: "removeScriptElement"), saved["removeScripts"] == nil {
+            saved["removeScripts"] = removeScripts
+        }
+        plugins = defaults.plugins.merging(saved.filter { defaults.plugins[$0.key] != nil }) { _, saved in saved }
     }
 
     func isEnabled(_ plugin: String) -> Bool {

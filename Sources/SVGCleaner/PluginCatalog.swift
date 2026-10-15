@@ -15,7 +15,7 @@ struct PluginCategory: Identifiable {
     let plugins: [PluginDef]
 }
 
-/// Mirrors the svgomg.net toggles. Defaults follow SVGO's preset-default, except removeViewBox (breaks scaling).
+/// Mirrors the svgomg.net toggles. Defaults follow SVGO 4's preset-default.
 enum PluginCatalog {
     static let categories: [PluginCategory] = [
         PluginCategory(id: "cleanup", label: "Cleanup", plugins: [
@@ -51,8 +51,9 @@ enum PluginCatalog {
             PluginDef(name: "removeXMLProcInst", label: "Remove XML instructions", description: "Remove the <?xml?> processing instruction.", defaultEnabled: true),
             PluginDef(name: "removeComments", label: "Remove comments", description: "Remove <!-- --> comments.", defaultEnabled: true),
             PluginDef(name: "removeMetadata", label: "Remove metadata", description: "Remove <metadata> elements.", defaultEnabled: true),
+            PluginDef(name: "removeDeprecatedAttrs", label: "Remove deprecated attributes", description: "Remove attributes that are deprecated in SVG 2.", defaultEnabled: true),
             PluginDef(name: "removeEditorsNSData", label: "Remove editor data", description: "Remove editor namespaces, elements and attributes.", defaultEnabled: true),
-            PluginDef(name: "removeTitle", label: "Remove title", description: "Remove <title> elements.", defaultEnabled: true),
+            PluginDef(name: "removeTitle", label: "Remove title", description: "Remove <title> elements. Off by default, titles make SVGs accessible.", defaultEnabled: false),
             PluginDef(name: "removeDesc", label: "Remove description", description: "Remove <desc> elements.", defaultEnabled: true),
             PluginDef(name: "removeUselessDefs", label: "Remove useless defs", description: "Remove <defs> without IDs.", defaultEnabled: true),
             PluginDef(name: "removeEmptyAttrs", label: "Remove empty attributes", description: "Remove attributes with empty values.", defaultEnabled: true),
@@ -66,7 +67,7 @@ enum PluginCatalog {
             PluginDef(name: "removeViewBox", label: "Remove viewBox", description: "Remove viewBox when it matches width/height. Off by default, breaks scaling.", defaultEnabled: false),
             PluginDef(name: "removeDimensions", label: "Prefer viewBox to width/height", description: "Remove hardcoded width/height and keep (or derive) a viewBox so the SVG scales.", defaultEnabled: true),
             PluginDef(name: "removeOffCanvasPaths", label: "Remove off-canvas paths", description: "Remove path shapes outside the viewBox.", defaultEnabled: false),
-            PluginDef(name: "removeScriptElement", label: "Remove scripts", description: "Remove <script> elements.", defaultEnabled: false),
+            PluginDef(name: "removeScripts", label: "Remove scripts", description: "Remove <script> elements, event handlers and javascript: links.", defaultEnabled: false),
             PluginDef(name: "removeStyleElement", label: "Remove style elements", description: "Remove all <style> elements.", defaultEnabled: false),
             PluginDef(name: "removeRasterImages", label: "Remove raster images", description: "Remove embedded raster images (JPEG/PNG…).", defaultEnabled: false),
             PluginDef(name: "removeXMLNS", label: "Remove xmlns", description: "Remove the xmlns attribute (only for inline SVG).", defaultEnabled: false),
@@ -77,15 +78,15 @@ enum PluginCatalog {
 
     static let defaultState: [String: Bool] = Dictionary(uniqueKeysWithValues: all.map { ($0.name, $0.defaultEnabled) })
 
-    /// Plugins bundled in SVGO 3.3's preset-default; toggled through its overrides instead of listed separately.
+    /// Plugins bundled in SVGO 4's preset-default; toggled through its overrides instead of listed separately.
     static let presetDefault: Set<String> = [
-        "removeDoctype", "removeXMLProcInst", "removeComments", "removeMetadata", "removeEditorsNSData",
-        "cleanupAttrs", "mergeStyles", "inlineStyles", "minifyStyles", "cleanupIds", "removeUselessDefs",
-        "cleanupNumericValues", "convertColors", "removeUnknownsAndDefaults", "removeNonInheritableGroupAttrs",
-        "removeUselessStrokeAndFill", "removeViewBox", "cleanupEnableBackground", "removeHiddenElems",
-        "removeEmptyText", "convertShapeToPath", "convertEllipseToCircle", "moveElemsAttrsToGroup",
-        "moveGroupAttrsToElems", "collapseGroups", "convertPathData", "convertTransform", "removeEmptyAttrs",
-        "removeEmptyContainers", "mergePaths", "removeUnusedNS", "sortAttrs", "sortDefsChildren", "removeTitle",
-        "removeDesc",
+        "removeDoctype", "removeXMLProcInst", "removeComments", "removeDeprecatedAttrs", "removeMetadata",
+        "removeEditorsNSData", "cleanupAttrs", "mergeStyles", "inlineStyles", "minifyStyles", "cleanupIds",
+        "removeUselessDefs", "cleanupNumericValues", "convertColors", "removeUnknownsAndDefaults",
+        "removeNonInheritableGroupAttrs", "removeUselessStrokeAndFill", "cleanupEnableBackground",
+        "removeHiddenElems", "removeEmptyText", "convertShapeToPath", "convertEllipseToCircle",
+        "moveElemsAttrsToGroup", "moveGroupAttrsToElems", "collapseGroups", "convertPathData", "convertTransform",
+        "removeEmptyAttrs", "removeEmptyContainers", "mergePaths", "removeUnusedNS", "sortAttrs",
+        "sortDefsChildren", "removeDesc",
     ]
 }
